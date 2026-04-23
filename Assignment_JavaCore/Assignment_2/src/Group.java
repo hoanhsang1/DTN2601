@@ -6,4 +6,5 @@ public class Group {
     String groupName;
     Account creator;
     Date createDate;
+    Account[] accounts;
 }
