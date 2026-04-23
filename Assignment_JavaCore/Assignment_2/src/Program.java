@@ -1,6 +1,7 @@
 // Program.java
 
 import java.util.Date;
+import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
@@ -58,10 +59,20 @@ public class Program {
         a3.department = d3;
         a3.position = p3;
         a3.createDate = new Date();
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        while (true) {
+            System.out.println("Exercise 1: Flow Control");
+            System.out.println("Exercise 2: System out printf");
+            System.out.println("Exercise 3: Date Format");
+            System.out.println("Exercise 4: Random Number");
+            System.out.println("Exercise 5: Input from console");
+            System.out.println("Exercise 6: Method");
+            System.out.println("Exercise 7: Exit");
+            choice = sc.nextInt();
+            if (!choice) {
 
-        // In ra 1 giá trị mỗi object
-        System.out.println(d1.departmentName);
-        System.out.println(p1.positionName);
-        System.out.println(a1.fullName);
+            }
+        }
     }
 }
