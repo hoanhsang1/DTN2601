@@ -1,3 +1,5 @@
+import Entity.Account;
+
 public class ExerciseSix {
     public static void question1() {
         for (int i = 2; i < 10; i += 2) {

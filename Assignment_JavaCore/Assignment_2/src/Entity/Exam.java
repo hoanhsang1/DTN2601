@@ -1,4 +1,4 @@
-// Exam.java
+package Entity;// Entity.Exam.java
 import java.util.Date;
 
 public class Exam {

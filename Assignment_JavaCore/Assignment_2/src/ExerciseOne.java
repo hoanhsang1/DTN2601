@@ -1,3 +1,7 @@
+import Entity.Account;
+import Entity.Department;
+import Entity.Group;
+
 import java.util.Objects;
 
 public class ExerciseOne {
@@ -13,7 +17,7 @@ public class ExerciseOne {
         if (a2.groups == null || a2.groups.length == 0) {
             System.out.println("Nhân viên này chưa có group");
         } else if (a2.groups.length == 1 || a2.groups.length == 2) {
-            System.out.println("Group của nhân viên này là Java Fresher, C# Fresher");
+            System.out.println("Entity.Group của nhân viên này là Java Fresher, C# Fresher");
         } else if (a2.groups.length == 3) {
             System.out.println("Nhân viên này là người quan trọng, tham gia nhiều group");
         } else {
@@ -59,7 +63,7 @@ public class ExerciseOne {
                 break;
             case 1:
             case 2:
-                System.out.println("Group của nhân viên này là Java Fresher, C# Fresher");
+                System.out.println("Entity.Group của nhân viên này là Java Fresher, C# Fresher");
                 break;
             case 3:
                 System.out.println("Nhân viên này là người quan trọng, tham gia nhiều group");
@@ -83,7 +87,7 @@ public class ExerciseOne {
 
     public static void question8(Account[] accounts) {
         for (Account acc : accounts) {
-            System.out.println("Email: " + acc.email + " - FullName: " + acc.fullName + " - Department: " + acc.department.departmentName);
+            System.out.println("Email: " + acc.email + " - FullName: " + acc.fullName + " - Entity.Department: " + acc.department.departmentName);
         }
     }
 
@@ -131,7 +135,7 @@ public class ExerciseOne {
     public static void question14(Account[] accounts) {
         for (Account acc : accounts) {
             if (acc.accountID < 4) {
-                System.out.println("Email: " + acc.email + " - FullName: " + acc.fullName + " - Department: " + acc.department.departmentName);
+                System.out.println("Email: " + acc.email + " - FullName: " + acc.fullName + " - Entity.Department: " + acc.department.departmentName);
             }
         }
     }
@@ -195,7 +199,7 @@ public class ExerciseOne {
                 i++;
                 continue;
             }
-            System.out.println("Email: " + accounts[i].email + " - FullName: " + accounts[i].fullName + " - Department: " + accounts[i].department.departmentName);
+            System.out.println("Email: " + accounts[i].email + " - FullName: " + accounts[i].fullName + " - Entity.Department: " + accounts[i].department.departmentName);
             i++;
         }
     }
@@ -266,7 +270,7 @@ public class ExerciseOne {
                 i++;
                 continue;
             }
-            System.out.println("Email: " + accounts[i].email + " - FullName: " + accounts[i].fullName + " - Department: " + accounts[i].department.departmentName);
+            System.out.println("Email: " + accounts[i].email + " - FullName: " + accounts[i].fullName + " - Entity.Department: " + accounts[i].department.departmentName);
             i++;
         } while (i < accounts.length);
     }

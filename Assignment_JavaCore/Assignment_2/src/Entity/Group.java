@@ -1,4 +1,4 @@
-// Group.java
+package Entity;// Entity.Group.java
 import java.util.Date;
 
 public class Group {

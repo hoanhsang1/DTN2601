@@ -1,4 +1,4 @@
-// Account.java
+package Entity;// Entity.Account.java
 import java.util.Date;
 
 public class Account {

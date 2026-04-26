@@ -1,3 +1,8 @@
+import Entity.Account;
+import Entity.Department;
+import Entity.Group;
+import Entity.Position;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,7 +59,7 @@ public class ExerciseFive {
         System.out.println("Nhập email:");
         account.email = scanner.nextLine();
         
-        System.out.println("Nhập Position (1: DEV, 2: TEST, 3: SCRUM_MASTER, 4: PM):");
+        System.out.println("Nhập Entity.Position (1: DEV, 2: TEST, 3: SCRUM_MASTER, 4: PM):");
         int pos = scanner.nextInt();
         Position position = new Position();
         position.positionID = pos;

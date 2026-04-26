@@ -1,3 +1,5 @@
+import Entity.Account;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -31,7 +33,7 @@ public class ExerciseTwo {
     }
 
     public static void question6(Account[] accounts) {
-        System.out.printf("%-25s | %-20s | %-15s%n", "Email", "FullName", "Department");
+        System.out.printf("%-25s | %-20s | %-15s%n", "Email", "FullName", "Entity.Department");
         System.out.println("-----------------------------------------------------------------------");
         for (Account acc : accounts) {
             String deptName = acc.department != null ? acc.department.departmentName : "Unknown";

@@ -1,4 +1,4 @@
-// GroupAccount.java
+package Entity;// Entity.GroupAccount.java
 import java.util.Date;
 
 public class GroupAccount {

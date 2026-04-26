@@ -1,3 +1,5 @@
+import Entity.Exam;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -7,7 +9,7 @@ public class ExerciseThree {
         Locale locale = new Locale("vi", "VN");
         DateFormat dateformat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
         String date = dateformat.format(exam.createDate);
-        System.out.println("Exam ID: " + exam.examID);
+        System.out.println("Entity.Exam ID: " + exam.examID);
         System.out.println("Code: " + exam.code);
         System.out.println("Title: " + exam.title);
         System.out.println("Create Date: " + date);
@@ -17,7 +19,7 @@ public class ExerciseThree {
         String pattern = "yyyy-MM-dd-HH-mm-ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String date = simpleDateFormat.format(exam.createDate);
-        System.out.println("Exam ID: " + exam.examID);
+        System.out.println("Entity.Exam ID: " + exam.examID);
         System.out.println("Code: " + exam.code);
         System.out.println("Title: " + exam.title);
         System.out.println("Create Date: " + date);

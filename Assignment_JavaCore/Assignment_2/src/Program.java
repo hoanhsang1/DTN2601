@@ -1,12 +1,16 @@
 // Program.java
 
+import Entity.Account;
+import Entity.Department;
+import Entity.Position;
+
 import java.util.Date;
 import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
 
-        // Department
+        // Entity.Department
         Department d1 = new Department();
         d1.departmentID = 1;
         d1.departmentName = "Sale";
@@ -19,7 +23,7 @@ public class Program {
         d3.departmentID = 3;
         d3.departmentName = "IT";
 
-        // Position
+        // Entity.Position
         Position p1 = new Position();
         p1.positionID = 1;
         p1.positionName = PositionName.DEV;
@@ -32,7 +36,7 @@ public class Program {
         p3.positionID = 3;
         p3.positionName = PositionName.PM;
 
-        // Account
+        // Entity.Account
         Account a1 = new Account();
         a1.accountID = 1;
         a1.email = "a1@gmail.com";
