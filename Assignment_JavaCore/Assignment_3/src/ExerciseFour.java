@@ -15,7 +15,10 @@ public class ExerciseFour {
     public void QuestionTwo() {
         String s1 = sc.nextLine();
         String s2 = sc.nextLine();
-        System.out.println(s1 + s2);
+        StringBuffer sb = new StringBuffer();
+        sb.append(s1);
+        sb.append(s2);
+        System.out.println(sb.toString());
     }
 
 
@@ -117,10 +120,19 @@ public class ExerciseFour {
     }
 
 
-    public void QuestionThirteen() {
+    public static void QuestionThirteen() {
+        Scanner sc = new Scanner(System.in);
         String str = sc.nextLine();
-        boolean ok = str != null && !str.matches(".*\\d.*");
-        System.out.println(ok);
+
+        int count = 0;
+
+        for (char c : str.toCharArray()) {
+            if (Character.isDigit(c)) {
+                count++;
+            }
+        }
+
+        System.out.println(count);
     }
 
 

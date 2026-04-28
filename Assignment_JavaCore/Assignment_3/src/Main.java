@@ -165,27 +165,82 @@ public class Main {
             System.out.println("\n================== EXERCISE 4 ==================");
             ExerciseFour ex4 = new ExerciseFour();
 
-            // Các method của Exercise 4 cần nhập từ bàn phím, comment để không bị treo chương trình
-            System.out.println("(Các method của Exercise 4 cần nhập từ bàn phím, bỏ qua để chạy tự động)");
-            System.out.println("Để test, hãy gọi từng method riêng lẻ:");
-            System.out.println("  ex4.QuestionOne(); -> Đếm số từ");
-            System.out.println("  ex4.QuestionTwo(); -> Nối chuỗi");
-            System.out.println("  ex4.QuestionThree(); -> Viết hoa chữ cái đầu");
-            System.out.println("  ex4.QuestionFour(); -> In từng ký tự");
-            System.out.println("  ex4.QuestionFive(); -> Nhập họ tên");
-            System.out.println("  ex4.QuestionSix(); -> Tách họ, tên đệm, tên");
-            System.out.println("  ex4.QuestionSeven(); -> Chuẩn hóa chuỗi");
-            System.out.println("  ex4.QuestionEight(); -> Group chứa 'Java'");
-            ex4.QuestionEight();  // Method này không cần nhập
-            System.out.println("  ex4.QuestionNine(); -> Group 'Java'");
-            ex4.QuestionNine();   // Method này không cần nhập
-            System.out.println("  ex4.QuestionTen(); -> Kiểm tra đảo ngược (cần nhập)");
-            System.out.println("  ex4.QuestionEleven(); -> Đếm ký tự 'a' (cần nhập)");
-            System.out.println("  ex4.QuestionTwelve(); -> Đảo ngược chuỗi (cần nhập)");
-            System.out.println("  ex4.QuestionThirteen(); -> Kiểm tra chữ số (cần nhập)");
-            System.out.println("  ex4.QuestionFourteen(); -> Thay thế ký tự (cần nhập)");
-            System.out.println("  ex4.QuestionFifteen(); -> Đảo ngược từ (cần nhập)");
-            System.out.println("  ex4.QuestionSixteen(); -> Chia chuỗi (cần nhập)");
+
+            System.out.println("\n--- Question 1: Đếm số từ ---");
+            System.out.print("Nhập xâu kí tự: ");
+            ex4.QuestionOne();
+
+            System.out.println("\n--- Question 2: Nối chuỗi ---");
+            System.out.print("Nhập xâu s1: ");
+            ex4.QuestionTwo();
+
+            System.out.println("\n--- Question 3: Viết hoa chữ cái đầu ---");
+            System.out.print("Nhập tên: ");
+            ex4.QuestionThree();
+
+
+            System.out.println("\n--- Question 4: In từng ký tự ---");
+            System.out.print("Nhập tên: ");
+            ex4.QuestionFour();
+
+
+            System.out.println("\n--- Question 5: Nhập họ và tên ---");
+            System.out.print("Nhập họ: ");
+            ex4.QuestionFive();
+
+
+            System.out.println("\n--- Question 6: Tách họ, tên đệm, tên ---");
+            System.out.print("Nhập họ và tên đầy đủ: ");
+            ex4.QuestionSix();
+
+
+            System.out.println("\n--- Question 7: Chuẩn hóa chuỗi ---");
+            System.out.print("Nhập họ và tên đầy đủ: ");
+            ex4.QuestionSeven();
+
+
+            System.out.println("\n--- Question 8: Group chứa 'Java' ---");
+            ex4.QuestionEight();
+
+
+            System.out.println("\n--- Question 9: Group 'Java' ---");
+            ex4.QuestionNine();
+
+
+            System.out.println("\n--- Question 10: Kiểm tra đảo ngược ---");
+            System.out.print("Nhập chuỗi thứ nhất: ");
+            System.out.print("Nhập chuỗi thứ hai: ");
+            ex4.QuestionTen();
+
+
+            System.out.println("\n--- Question 11: Đếm ký tự 'a' ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionEleven();
+
+
+            System.out.println("\n--- Question 12: Đảo ngược chuỗi ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionTwelve();
+
+
+            System.out.println("\n--- Question 13: Kiểm tra chuỗi không chứa số ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionThirteen();
+
+
+            System.out.println("\n--- Question 14: Thay thế ký tự ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionFourteen();
+
+
+            System.out.println("\n--- Question 15: Đảo ngược chuỗi theo từ ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionFifteen();
+
+
+            System.out.println("\n--- Question 16: Chia chuỗi ---");
+            System.out.print("Nhập chuỗi: ");
+            ex4.QuestionSixteen();
 
             System.out.println("\n================== EXERCISE 5 ==================");
 
