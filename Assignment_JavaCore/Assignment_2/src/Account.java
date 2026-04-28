@@ -1,5 +1,3 @@
-// Account.java
-import java.util.Date;
 
 public class Account {
     int accountID;
