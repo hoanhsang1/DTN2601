@@ -7,10 +7,10 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Tạo dữ liệu mẫu cho các Entity
+            // ==================== KHỞI TẠO DỮ LIỆU ====================
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-            // 1. Tạo Department (ít nhất 4 giá trị)
+            // 1. Tạo Department
             List<Department> departments = new ArrayList<>();
             departments.add(new Department(1, "Phòng Kỹ thuật"));
             departments.add(new Department(2, "Phòng Kinh doanh"));
@@ -18,29 +18,29 @@ public class Main {
             departments.add(new Department(4, "Phòng Marketing"));
             departments.add(new Department(5, "Phòng Tài chính"));
 
-            // 2. Tạo Position (ít nhất 4 giá trị)
+            // 2. Tạo Position
             List<Position> positions = new ArrayList<>();
             positions.add(new Position(1, PositionName.DEV));
             positions.add(new Position(2, PositionName.TEST));
             positions.add(new Position(3, PositionName.SCRUM_MASTER));
             positions.add(new Position(4, PositionName.PM));
 
-            // 3. Tạo Account (ít nhất 4 giá trị)
+            // 3. Tạo Account (có salary)
             List<Account> accounts = new ArrayList<>();
             accounts.add(new Account(1, "user1@company.com", "user1", "Nguyễn Văn A",
-                    departments.get(0), positions.get(0)));
+                    departments.get(0), positions.get(0), 5240.5f));
             accounts.add(new Account(2, "user2@company.com", "user2", "Trần Thị B",
-                    departments.get(1), positions.get(1)));
+                    departments.get(1), positions.get(1), 10970.055f));
             accounts.add(new Account(3, "user3@company.com", "user3", "Lê Văn C",
-                    departments.get(2), positions.get(2)));
+                    departments.get(2), positions.get(2), 10000));
             accounts.add(new Account(4, "user4@company.com", "user4", "Phạm Thị D",
-                    departments.get(3), positions.get(3)));
+                    departments.get(3), positions.get(3), 9999));
             accounts.add(new Account(5, "user5@company.com", "user5", "Hoàng Văn E",
-                    departments.get(4), positions.get(0)));
+                    departments.get(4), positions.get(0), 3000));
             accounts.add(new Account(6, "user6@company.com", "user6", "Hoàng Văn F",
-                    null, positions.get(0)));
+                    null, positions.get(0), 8000));
 
-            // 4. Tạo CategoryQuestion (ít nhất 4 giá trị)
+            // 4. Tạo CategoryQuestion
             List<CategoryQuestion> categories = new ArrayList<>();
             categories.add(new CategoryQuestion(1, CategoryName.JAVA));
             categories.add(new CategoryQuestion(2, CategoryName.DOT_NET));
@@ -48,14 +48,14 @@ public class Main {
             categories.add(new CategoryQuestion(4, CategoryName.POSTMAN));
             categories.add(new CategoryQuestion(5, CategoryName.RUBY));
 
-            // 5. Tạo TypeQuestion (ít nhất 4 giá trị - chỉ có 2 enum nên tạo nhiều instance)
+            // 5. Tạo TypeQuestion
             List<TypeQuestion> typeQuestions = new ArrayList<>();
             typeQuestions.add(new TypeQuestion(1, TypeName.ESSAY));
             typeQuestions.add(new TypeQuestion(2, TypeName.MULTIPLE_CHOICE));
             typeQuestions.add(new TypeQuestion(3, TypeName.ESSAY));
             typeQuestions.add(new TypeQuestion(4, TypeName.MULTIPLE_CHOICE));
 
-            // 6. Tạo Question (ít nhất 4 giá trị)
+            // 6. Tạo Question
             List<Question> questions = new ArrayList<>();
             questions.add(new Question(1, "Java là gì?", categories.get(0),
                     typeQuestions.get(0), accounts.get(0), sdf.parse("2024-01-01")));
@@ -68,7 +68,7 @@ public class Main {
             questions.add(new Question(5, "Ruby on Rails là gì?", categories.get(4),
                     typeQuestions.get(0), accounts.get(4), sdf.parse("2024-01-05")));
 
-            // 7. Tạo Answer (ít nhất 4 giá trị)
+            // 7. Tạo Answer
             List<Answer> answers = new ArrayList<>();
             answers.add(new Answer(1, "Java là ngôn ngữ lập trình hướng đối tượng",
                     questions.get(0), true));
@@ -81,7 +81,7 @@ public class Main {
             answers.add(new Answer(5, "Ruby on Rails là framework web",
                     questions.get(4), true));
 
-            // 8. Tạo Group (ít nhất 4 giá trị)
+            // 8. Tạo Group
             List<Group> groups = new ArrayList<>();
             groups.add(new Group(1, "Nhóm Java", accounts.get(0), sdf.parse("2024-01-01")));
             groups.add(new Group(2, "Nhóm .NET", accounts.get(1), sdf.parse("2024-01-02")));
@@ -89,7 +89,7 @@ public class Main {
             groups.add(new Group(4, "Nhóm Testing", accounts.get(3), sdf.parse("2024-01-04")));
             groups.add(new Group(5, "Nhóm DevOps", accounts.get(4), sdf.parse("2024-01-05")));
 
-            // 9. Tạo GroupAccount (ít nhất 4 giá trị)
+            // 9. Tạo GroupAccount
             List<GroupAccount> groupAccounts = new ArrayList<>();
             groupAccounts.add(new GroupAccount(groups.get(0), accounts.get(0), sdf.parse("2024-01-10")));
             groupAccounts.add(new GroupAccount(groups.get(0), accounts.get(1), sdf.parse("2024-01-11")));
@@ -97,7 +97,7 @@ public class Main {
             groupAccounts.add(new GroupAccount(groups.get(2), accounts.get(3), sdf.parse("2024-01-13")));
             groupAccounts.add(new GroupAccount(groups.get(3), accounts.get(4), sdf.parse("2024-01-14")));
 
-            // 10. Tạo Exam (ít nhất 4 giá trị)
+            // 10. Tạo Exam
             List<Exam> exams = new ArrayList<>();
             exams.add(new Exam(1, "EX001", "Kiểm tra Java cơ bản", categories.get(0),
                     60, accounts.get(0), sdf.parse("2024-02-01")));
@@ -110,7 +110,7 @@ public class Main {
             exams.add(new Exam(5, "EX005", "Kiểm tra Ruby", categories.get(4),
                     60, accounts.get(4), sdf.parse("2024-02-05")));
 
-            // 11. Tạo ExamQuestion (ít nhất 4 giá trị)
+            // 11. Tạo ExamQuestion
             List<ExamQuestion> examQuestions = new ArrayList<>();
             examQuestions.add(new ExamQuestion(exams.get(0), questions.get(0)));
             examQuestions.add(new ExamQuestion(exams.get(0), questions.get(1)));
@@ -118,8 +118,110 @@ public class Main {
             examQuestions.add(new ExamQuestion(exams.get(2), questions.get(3)));
             examQuestions.add(new ExamQuestion(exams.get(3), questions.get(4)));
 
-            ExerciseOne exerciseOne = new ExerciseOne();
-            exerciseOne.questionOne(accounts.get(2));
+            // ==================== TEST CÁC EXERCISE ====================
+
+            System.out.println("================== EXERCISE 1 ==================");
+            ExerciseOne ex1 = new ExerciseOne();
+
+            // Question 1: Làm tròn lương
+            System.out.println("\n--- Question 1: Làm tròn lương ---");
+            ex1.QuestionOne(accounts);
+
+            // Question 2: Số ngẫu nhiên 5 chữ số
+            System.out.println("\n--- Question 2: Số ngẫu nhiên 5 chữ số ---");
+            ex1.QuestionTwo();
+
+            // Question 3: Lấy 2 số cuối
+            System.out.println("\n--- Question 3: Lấy 2 số cuối của số 12345 ---");
+            ex1.QuestionThree(12345);
+
+            // Question 4: Tính thương (comment vì cần nhập từ bàn phím)
+            System.out.println("\n--- Question 4: Tính thương (bỏ qua vì cần nhập tay) ---");
+            // float result = ex1.QuestionFour();
+            // System.out.println("Thương: " + result);
+
+            System.out.println("\n================== EXERCISE 2 ==================");
+            ExerciseTwo ex2 = new ExerciseTwo();
+
+            // Question 1: Tạo 5 account mới
+            System.out.println("\n--- Question 1: Tạo 5 account mới ---");
+            ex2.QuestionOne(5);
+
+            System.out.println("\n================== EXERCISE 3 ==================");
+            ExerciseThree ex3 = new ExerciseThree();
+
+            // Question 1: Boxing & Unboxing
+            System.out.println("\n--- Question 1: Integer to Float ---");
+            ex3.QuestionOne();
+
+            // Question 2: String to Int
+            System.out.println("\n--- Question 2: String to Int ---");
+            ex3.QuestionTwo();
+
+            // Question 3: Integer to int
+            System.out.println("\n--- Question 3: Integer to int ---");
+            ex3.QuestionThree();
+
+            System.out.println("\n================== EXERCISE 4 ==================");
+            ExerciseFour ex4 = new ExerciseFour();
+
+            // Các method của Exercise 4 cần nhập từ bàn phím, comment để không bị treo chương trình
+            System.out.println("(Các method của Exercise 4 cần nhập từ bàn phím, bỏ qua để chạy tự động)");
+            System.out.println("Để test, hãy gọi từng method riêng lẻ:");
+            System.out.println("  ex4.QuestionOne(); -> Đếm số từ");
+            System.out.println("  ex4.QuestionTwo(); -> Nối chuỗi");
+            System.out.println("  ex4.QuestionThree(); -> Viết hoa chữ cái đầu");
+            System.out.println("  ex4.QuestionFour(); -> In từng ký tự");
+            System.out.println("  ex4.QuestionFive(); -> Nhập họ tên");
+            System.out.println("  ex4.QuestionSix(); -> Tách họ, tên đệm, tên");
+            System.out.println("  ex4.QuestionSeven(); -> Chuẩn hóa chuỗi");
+            System.out.println("  ex4.QuestionEight(); -> Group chứa 'Java'");
+            ex4.QuestionEight();  // Method này không cần nhập
+            System.out.println("  ex4.QuestionNine(); -> Group 'Java'");
+            ex4.QuestionNine();   // Method này không cần nhập
+            System.out.println("  ex4.QuestionTen(); -> Kiểm tra đảo ngược (cần nhập)");
+            System.out.println("  ex4.QuestionEleven(); -> Đếm ký tự 'a' (cần nhập)");
+            System.out.println("  ex4.QuestionTwelve(); -> Đảo ngược chuỗi (cần nhập)");
+            System.out.println("  ex4.QuestionThirteen(); -> Kiểm tra chữ số (cần nhập)");
+            System.out.println("  ex4.QuestionFourteen(); -> Thay thế ký tự (cần nhập)");
+            System.out.println("  ex4.QuestionFifteen(); -> Đảo ngược từ (cần nhập)");
+            System.out.println("  ex4.QuestionSixteen(); -> Chia chuỗi (cần nhập)");
+
+            System.out.println("\n================== EXERCISE 5 ==================");
+
+            // Tạo department array cho Exercise 5
+            Department[] deptArray = {
+                    new Department(1, "Accounting"),
+                    new Department(2, "Boss of director"),
+                    new Department(3, "Marketing"),
+                    new Department(4, "Sale"),
+                    new Department(5, "Waiting room")
+            };
+
+            // Question 1: In thông tin phòng ban thứ 1
+            System.out.println("\n--- Question 1: Thông tin phòng ban thứ 1 ---");
+            ExerciseFive.QuestionOne(deptArray);
+
+            // Question 2: In tất cả phòng ban
+            System.out.println("\n--- Question 2: Tất cả phòng ban ---");
+            ExerciseFive.QuestionTwo(deptArray);
+
+            // Question 3: In địa chỉ phòng ban thứ 1
+            System.out.println("\n--- Question 3: Địa chỉ phòng ban thứ 1 ---");
+            ExerciseFive.QuestionThree(deptArray);
+
+            // Question 4: Kiểm tra tên phòng ban thứ 1
+            System.out.println("\n--- Question 4: Kiểm tra tên 'Phòng A' ---");
+            ExerciseFive.QuestionFour(deptArray);
+
+            // Question 5: So sánh 2 phòng ban
+            System.out.println("\n--- Question 5: So sánh phòng ban 1 và 2 ---");
+            ExerciseFive.QuestionFive(deptArray);
+
+            // Question 6 & 7: Sắp xếp phòng ban theo tên
+            System.out.println("\n--- Question 6 & 7: Sắp xếp phòng ban theo tên ---");
+            ExerciseFive.QuestionSix();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
