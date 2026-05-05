@@ -1,7 +1,6 @@
-package Entity;// Entity.GroupAccount.java
+package com.vti.entity;// com.vti.entity.GroupAccount.java
 
 import java.util.Date;
-import java.util.Objects;
 
 public class GroupAccount {
     private Group group;
@@ -39,11 +38,5 @@ public class GroupAccount {
 
     public void setJoinDate(Date joinDate) {
         this.joinDate = joinDate;
-    }
-
-    public boolean equalsAcc(Account acc) {
-        return acc != null
-                && this.account != null
-                && acc.getAccountID() == this.account.getAccountID();
     }
 }
