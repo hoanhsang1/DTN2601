@@ -1,6 +1,6 @@
 package com.vti.entity;
 
-import Enum.TypeName;
+import com.vti.Enum.TypeName;
 
 public class TypeQuestion {
     private int typeID;

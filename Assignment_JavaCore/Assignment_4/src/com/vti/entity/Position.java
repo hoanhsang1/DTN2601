@@ -1,6 +1,6 @@
 package com.vti.entity;
 
-import Enum.PositionName;
+import com.vti.Enum.PositionName;
 
 // com.vti.entity.Position.java
 public class Position {

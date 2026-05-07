@@ -1,6 +1,6 @@
 package com.vti.entity;
 
-import Enum.CategoryName;
+import com.vti.Enum.CategoryName;
 
 public class CategoryQuestion {
     private int categoryID;
