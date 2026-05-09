@@ -38,9 +38,6 @@ public class ExerciseOne {
         }
     }
 
-    public QuestionThree(Account acc) {
-
-    }
 
 
 }

@@ -1,13 +1,16 @@
 package com.vti.frontend;
 
+import com.vti.backend.Excercise1;
 import com.vti.entity.VietnamesePhone;
 import com.vti.entity.Employee;
 import com.vti.entity.Manager;
 import com.vti.entity.Waiter;
 
+import java.sql.SQLException;
+
 public class Exercise6 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
 
         VietnamesePhone phone = new VietnamesePhone();
 
@@ -30,5 +33,8 @@ public class Exercise6 {
         e.displayInfor();
         m.displayInfor();
         w.displayInfor();
+
+        Excercise1 e1 = new Excercise1();
+        e1.getVanBo();
     }
 }
