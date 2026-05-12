@@ -1,14 +1,16 @@
 package com.vti.entity;
 
+import com.vti.Enum.PositionName;
+
 public class Position {
 
     private int positionId;
-    private String positionName;
+    private PositionName positionName;
 
     public Position() {
     }
 
-    public Position(int positionId, String positionName) {
+    public Position(int positionId, PositionName positionName) {
         this.positionId = positionId;
         this.positionName = positionName;
     }
@@ -21,11 +23,11 @@ public class Position {
         this.positionId = positionId;
     }
 
-    public String getPositionName() {
+    public PositionName getPositionName() {
         return positionName;
     }
 
-    public void setPositionName(String positionName) {
+    public void setPositionName(PositionName positionName) {
         this.positionName = positionName;
     }
 
