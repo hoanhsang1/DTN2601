@@ -1,13 +1,5 @@
 package org.example.backend.repository.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.example.backend.repository.IAccountRepository;
 import org.example.entity.Account;
 import org.example.entity.Department;
@@ -15,10 +7,14 @@ import org.example.entity.Position;
 import org.example.enums.PositionName;
 import org.example.utils.JDBCUtils;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class AccountRepositoryImpl implements IAccountRepository {
 
     private static final String SELECT_BASE =
-            "select a.account_id, a.username, a.full_name, a.email, a.create_date, " +
+            "select a.account_id, a.username, a.fullname, a.email, a.create_date, " +
             "d.department_id, d.department_name, p.position_id, p.position_name " +
             "from account a " +
             "join department d on a.department_id = d.department_id " +
@@ -26,11 +22,12 @@ public class AccountRepositoryImpl implements IAccountRepository {
 
     private Account mapRow(ResultSet rs) throws SQLException {
         Department dep = new Department(rs.getInt("department_id"), rs.getString("department_name"));
-        Position pos = new Position(rs.getInt("position_id"), PositionName.valueOf(rs.getString("position_name")));
+        Position pos = new Position(rs.getInt("position_id"),
+                PositionName.fromDb(rs.getString("position_name")));
         return new Account(
                 rs.getInt("account_id"),
                 rs.getString("username"),
-                rs.getString("full_name"),
+                rs.getString("fullname"),
                 rs.getString("email"),
                 dep, pos,
                 rs.getDate("create_date")
@@ -74,7 +71,7 @@ public class AccountRepositoryImpl implements IAccountRepository {
         try {
             Connection conn = JDBCUtils.getConnection();
             PreparedStatement ps = conn.prepareStatement(
-                    SELECT_BASE + "where a.full_name like ? order by a.account_id asc");
+                    SELECT_BASE + "where a.fullname like ? order by a.account_id asc");
             ps.setString(1, "%" + name + "%");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapRow(rs));
@@ -85,12 +82,103 @@ public class AccountRepositoryImpl implements IAccountRepository {
         return list;
     }
 
+    // ------------------------------------------------------------------ validation
+
+    @Override
+    public boolean existsById(int id) {
+        try {
+            Connection conn = JDBCUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "select count(1) from account where account_id = ?");
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next() && rs.getInt(1) > 0;
+            JDBCUtils.close(conn, ps, rs);
+            return exists;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        try {
+            Connection conn = JDBCUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "select count(1) from account where username = ?");
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next() && rs.getInt(1) > 0;
+            JDBCUtils.close(conn, ps, rs);
+            return exists;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByUsernameExcludeId(String username, int excludeId) {
+        try {
+            Connection conn = JDBCUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "select count(1) from account where username = ? and account_id <> ?");
+            ps.setString(1, username);
+            ps.setInt(2, excludeId);
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next() && rs.getInt(1) > 0;
+            JDBCUtils.close(conn, ps, rs);
+            return exists;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        try {
+            Connection conn = JDBCUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "select count(1) from account where email = ?");
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next() && rs.getInt(1) > 0;
+            JDBCUtils.close(conn, ps, rs);
+            return exists;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmailExcludeId(String email, int excludeId) {
+        try {
+            Connection conn = JDBCUtils.getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "select count(1) from account where email = ? and account_id <> ?");
+            ps.setString(1, email);
+            ps.setInt(2, excludeId);
+            ResultSet rs = ps.executeQuery();
+            boolean exists = rs.next() && rs.getInt(1) > 0;
+            JDBCUtils.close(conn, ps, rs);
+            return exists;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ------------------------------------------------------------------ CRUD
+
     @Override
     public boolean create(String username, String fullName, String email, int departmentId, int positionId) {
         try {
             Connection conn = JDBCUtils.getConnection();
             PreparedStatement ps = conn.prepareStatement(
-                    "insert into account (username, full_name, email, department_id, position_id, create_date) " +
+                    "insert into account (username, fullname, email, department_id, position_id, create_date) " +
                     "values (?, ?, ?, ?, ?, now())");
             ps.setString(1, username);
             ps.setString(2, fullName);
@@ -111,7 +199,7 @@ public class AccountRepositoryImpl implements IAccountRepository {
         try {
             Connection conn = JDBCUtils.getConnection();
             PreparedStatement ps = conn.prepareStatement(
-                    "update account set username = ?, full_name = ?, email = ?, " +
+                    "update account set username = ?, fullname = ?, email = ?, " +
                     "department_id = ?, position_id = ? where account_id = ?");
             ps.setString(1, username);
             ps.setString(2, fullName);
@@ -132,7 +220,8 @@ public class AccountRepositoryImpl implements IAccountRepository {
     public boolean delete(int id) {
         try {
             Connection conn = JDBCUtils.getConnection();
-            PreparedStatement ps = conn.prepareStatement("delete from account where account_id = ?");
+            PreparedStatement ps = conn.prepareStatement(
+                    "delete from account where account_id = ?");
             ps.setInt(1, id);
             int c = ps.executeUpdate();
             JDBCUtils.close(conn, ps, null);

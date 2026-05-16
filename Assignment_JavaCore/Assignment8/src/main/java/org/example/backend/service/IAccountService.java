@@ -8,7 +8,11 @@ public interface IAccountService {
     List<Account> findAll();
     Account findById(int id);
     List<Account> findByName(String name);
-    boolean create(String username, String fullName, String email, int departmentId, int positionId);
-    boolean update(int id, String username, String fullName, String email, int departmentId, int positionId);
-    boolean delete(int id);
+
+    /**
+     * Trả về null nếu thành công, chuỗi thông báo lỗi nếu validation thất bại.
+     */
+    String create(String username, String fullName, String email, int departmentId, int positionId);
+    String update(int id, String username, String fullName, String email, int departmentId, int positionId);
+    String delete(int id);
 }

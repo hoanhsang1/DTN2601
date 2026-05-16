@@ -22,15 +22,20 @@ public class AccountController {
         return accountService.findByName(name);
     }
 
-    public boolean create(String username, String fullName, String email, int departmentId, int positionId) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String create(String username, String fullName, String email,
+                         int departmentId, int positionId) {
         return accountService.create(username, fullName, email, departmentId, positionId);
     }
 
-    public boolean update(int id, String username, String fullName, String email, int departmentId, int positionId) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String update(int id, String username, String fullName, String email,
+                         int departmentId, int positionId) {
         return accountService.update(id, username, fullName, email, departmentId, positionId);
     }
 
-    public boolean delete(int id) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String delete(int id) {
         return accountService.delete(id);
     }
 }

@@ -13,12 +13,11 @@ import org.example.entity.Position;
 
 public class AccountFunction {
 
-    AccountController accountController       = new AccountController();
+    AccountController    accountController    = new AccountController();
     DepartmentController departmentController = new DepartmentController();
-    PositionController positionController     = new PositionController();
+    PositionController   positionController   = new PositionController();
     private final Scanner sc = new Scanner(System.in);
 
-    // +-------+--------------------+----------------------+------------------------------+------------------------+----------------+------------+
     private static final String BORDER =
             "+-------+--------------------+----------------------+------------------------------+------------------------+----------------+";
     private static final String HEADER_FMT =
@@ -78,7 +77,7 @@ public class AccountFunction {
             Account acc = accountController.findById(id);
             showAccount(acc != null ? Collections.singletonList(acc) : Collections.emptyList());
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -91,8 +90,10 @@ public class AccountFunction {
     private void insertAccount() {
         System.out.print("Nhập username: ");
         String username = sc.nextLine().trim();
+
         System.out.print("Nhập họ tên: ");
         String fullName = sc.nextLine().trim();
+
         System.out.print("Nhập email: ");
         String email = sc.nextLine().trim();
 
@@ -102,18 +103,25 @@ public class AccountFunction {
         int positionId = choosePosition();
         if (positionId == -1) return;
 
-        System.out.println(accountController.create(username, fullName, email, departmentId, positionId)
-                ? "Thêm mới thành công." : "Thêm mới thất bại.");
+        String error = accountController.create(username, fullName, email, departmentId, positionId);
+        if (error == null) {
+            System.out.println("[OK] Thêm mới thành công.");
+        } else {
+            System.out.println("[Lỗi] " + error);
+        }
     }
 
     private void updateAccount() {
         System.out.print("Nhập ID account cần cập nhật: ");
         try {
             int id = Integer.parseInt(sc.nextLine().trim());
+
             System.out.print("Nhập username mới: ");
             String username = sc.nextLine().trim();
+
             System.out.print("Nhập họ tên mới: ");
             String fullName = sc.nextLine().trim();
+
             System.out.print("Nhập email mới: ");
             String email = sc.nextLine().trim();
 
@@ -123,10 +131,14 @@ public class AccountFunction {
             int positionId = choosePosition();
             if (positionId == -1) return;
 
-            System.out.println(accountController.update(id, username, fullName, email, departmentId, positionId)
-                    ? "Cập nhật thành công." : "Cập nhật thất bại.");
+            String error = accountController.update(id, username, fullName, email, departmentId, positionId);
+            if (error == null) {
+                System.out.println("[OK] Cập nhật thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
+            }
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -134,13 +146,17 @@ public class AccountFunction {
         System.out.print("Nhập ID account cần xóa: ");
         try {
             int id = Integer.parseInt(sc.nextLine().trim());
-            System.out.println(accountController.delete(id) ? "Xóa thành công." : "Xóa thất bại.");
+            String error = accountController.delete(id);
+            if (error == null) {
+                System.out.println("[OK] Xóa thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
+            }
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
-    // hiển thị bảng department và trả về ID được chọn, -1 nếu lỗi
     private int chooseDepartment() {
         List<Department> departments = departmentController.findAll();
         System.out.println("+-------+------------------------+");
@@ -154,12 +170,11 @@ public class AccountFunction {
         try {
             return Integer.parseInt(sc.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
             return -1;
         }
     }
 
-    // hiển thị bảng position và trả về ID được chọn, -1 nếu lỗi
     private int choosePosition() {
         List<Position> positions = positionController.findAll();
         System.out.println("+-------+----------------+");
@@ -173,7 +188,7 @@ public class AccountFunction {
         try {
             return Integer.parseInt(sc.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
             return -1;
         }
     }

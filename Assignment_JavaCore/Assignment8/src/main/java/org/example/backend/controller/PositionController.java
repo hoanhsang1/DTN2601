@@ -30,15 +30,18 @@ public class PositionController {
         return positionService.findLeastEmployees();
     }
 
-    public boolean create(String name) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String create(String name) {
         return positionService.create(name);
     }
 
-    public boolean update(int id, String name) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String update(int id, String name) {
         return positionService.update(id, name);
     }
 
-    public boolean delete(int id) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String delete(int id) {
         return positionService.delete(id);
     }
 }

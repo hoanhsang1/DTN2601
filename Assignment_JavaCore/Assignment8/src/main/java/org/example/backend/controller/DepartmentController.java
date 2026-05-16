@@ -30,15 +30,18 @@ public class DepartmentController {
         return departmentService.findLeastEmployees();
     }
 
-    public boolean create(String name) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String create(String name) {
         return departmentService.create(name);
     }
 
-    public boolean update(int id, String name) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String update(int id, String name) {
         return departmentService.update(id, name);
     }
 
-    public boolean delete(int id) {
+    /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
+    public String delete(int id) {
         return departmentService.delete(id);
     }
 }

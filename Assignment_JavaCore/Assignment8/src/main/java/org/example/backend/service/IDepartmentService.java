@@ -10,7 +10,11 @@ public interface IDepartmentService {
     List<Department> findByName(String name);
     List<Department> findMostEmployees();
     List<Department> findLeastEmployees();
-    boolean create(String name);
-    boolean update(int id, String name);
-    boolean delete(int id);
+
+    /**
+     * Trả về null nếu thành công, chuỗi thông báo lỗi nếu validation thất bại.
+     */
+    String create(String name);
+    String update(int id, String name);
+    String delete(int id);
 }

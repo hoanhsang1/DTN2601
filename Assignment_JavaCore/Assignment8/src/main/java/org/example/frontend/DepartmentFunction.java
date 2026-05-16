@@ -12,7 +12,6 @@ public class DepartmentFunction {
     DepartmentController departmentController = new DepartmentController();
     private final Scanner sc = new Scanner(System.in);
 
-    // độ rộng cột
     private static final String BORDER     = "+-------+------------------------+";
     private static final String HEADER_FMT = "| %-5s | %-22s |%n";
     private static final String ROW_FMT    = "| %-5s | %-22s |%n";
@@ -32,14 +31,14 @@ public class DepartmentFunction {
             System.out.print("Chọn: ");
             String choice = sc.nextLine().trim();
             switch (choice) {
-                case "1": showDepartment(departmentController.findAll());           break;
-                case "2": findById();                                               break;
-                case "3": findByName();                                             break;
-                case "4": showDepartment(departmentController.findMostEmployees()); break;
-                case "5": showDepartment(departmentController.findLeastEmployees());break;
-                case "6": insertDepartment();                                       break;
-                case "7": updateDepartment();                                       break;
-                case "8": deleteDepartment();                                       break;
+                case "1": showDepartment(departmentController.findAll());            break;
+                case "2": findById();                                                break;
+                case "3": findByName();                                              break;
+                case "4": showDepartment(departmentController.findMostEmployees());  break;
+                case "5": showDepartment(departmentController.findLeastEmployees()); break;
+                case "6": insertDepartment();                                        break;
+                case "7": updateDepartment();                                        break;
+                case "8": deleteDepartment();                                        break;
                 case "0": return;
                 default:  System.out.println("Lựa chọn không hợp lệ, thử lại.");
             }
@@ -67,7 +66,7 @@ public class DepartmentFunction {
             Department dep = departmentController.findById(id);
             showDepartment(dep != null ? Collections.singletonList(dep) : Collections.emptyList());
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -80,8 +79,12 @@ public class DepartmentFunction {
     private void insertDepartment() {
         System.out.print("Nhập tên phòng ban mới: ");
         String name = sc.nextLine().trim();
-        if (name.isEmpty()) { System.out.println("Tên không được để trống."); return; }
-        System.out.println(departmentController.create(name) ? "Thêm mới thành công." : "Thêm mới thất bại.");
+        String error = departmentController.create(name);
+        if (error == null) {
+            System.out.println("[OK] Thêm mới thành công.");
+        } else {
+            System.out.println("[Lỗi] " + error);
+        }
     }
 
     private void updateDepartment() {
@@ -90,10 +93,14 @@ public class DepartmentFunction {
             int id = Integer.parseInt(sc.nextLine().trim());
             System.out.print("Nhập tên mới: ");
             String name = sc.nextLine().trim();
-            if (name.isEmpty()) { System.out.println("Tên không được để trống."); return; }
-            System.out.println(departmentController.update(id, name) ? "Cập nhật thành công." : "Cập nhật thất bại.");
+            String error = departmentController.update(id, name);
+            if (error == null) {
+                System.out.println("[OK] Cập nhật thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
+            }
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -101,9 +108,14 @@ public class DepartmentFunction {
         System.out.print("Nhập ID phòng ban cần xóa: ");
         try {
             int id = Integer.parseInt(sc.nextLine().trim());
-            System.out.println(departmentController.delete(id) ? "Xóa thành công." : "Xóa thất bại.");
+            String error = departmentController.delete(id);
+            if (error == null) {
+                System.out.println("[OK] Xóa thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
+            }
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 }

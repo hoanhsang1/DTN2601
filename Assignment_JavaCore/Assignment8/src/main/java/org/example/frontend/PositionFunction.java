@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import org.example.backend.controller.PositionController;
 import org.example.entity.Position;
-import org.example.enums.PositionName;
 
 public class PositionFunction {
 
@@ -32,14 +31,14 @@ public class PositionFunction {
             System.out.print("Chọn: ");
             String choice = sc.nextLine().trim();
             switch (choice) {
-                case "1": showPosition(positionController.findAll());            break;
-                case "2": findById();                                            break;
-                case "3": findByName();                                          break;
-                case "4": showPosition(positionController.findMostEmployees()); break;
-                case "5": showPosition(positionController.findLeastEmployees());break;
-                case "6": insertPosition();                                      break;
-                case "7": updatePosition();                                      break;
-                case "8": deletePosition();                                      break;
+                case "1": showPosition(positionController.findAll());             break;
+                case "2": findById();                                             break;
+                case "3": findByName();                                           break;
+                case "4": showPosition(positionController.findMostEmployees());   break;
+                case "5": showPosition(positionController.findLeastEmployees());  break;
+                case "6": insertPosition();                                       break;
+                case "7": updatePosition();                                       break;
+                case "8": deletePosition();                                       break;
                 case "0": return;
                 default:  System.out.println("Lựa chọn không hợp lệ, thử lại.");
             }
@@ -67,7 +66,7 @@ public class PositionFunction {
             Position pos = positionController.findById(id);
             showPosition(pos != null ? Collections.singletonList(pos) : Collections.emptyList());
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -80,14 +79,13 @@ public class PositionFunction {
     private void insertPosition() {
         System.out.println("Các giá trị hợp lệ: DEV, TEST, SCRUM_MASTER, PM");
         System.out.print("Nhập tên chức vụ: ");
-        String name = sc.nextLine().trim().toUpperCase();
-        try {
-            PositionName.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Tên chức vụ không hợp lệ.");
-            return;
+        String name = sc.nextLine().trim();
+        String error = positionController.create(name);
+        if (error == null) {
+            System.out.println("[OK] Thêm mới thành công.");
+        } else {
+            System.out.println("[Lỗi] " + error);
         }
-        System.out.println(positionController.create(name) ? "Thêm mới thành công." : "Thêm mới thất bại.");
     }
 
     private void updatePosition() {
@@ -96,16 +94,15 @@ public class PositionFunction {
             int id = Integer.parseInt(sc.nextLine().trim());
             System.out.println("Các giá trị hợp lệ: DEV, TEST, SCRUM_MASTER, PM");
             System.out.print("Nhập tên chức vụ mới: ");
-            String name = sc.nextLine().trim().toUpperCase();
-            try {
-                PositionName.valueOf(name);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Tên chức vụ không hợp lệ.");
-                return;
+            String name = sc.nextLine().trim();
+            String error = positionController.update(id, name);
+            if (error == null) {
+                System.out.println("[OK] Cập nhật thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
             }
-            System.out.println(positionController.update(id, name) ? "Cập nhật thành công." : "Cập nhật thất bại.");
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 
@@ -113,9 +110,14 @@ public class PositionFunction {
         System.out.print("Nhập ID chức vụ cần xóa: ");
         try {
             int id = Integer.parseInt(sc.nextLine().trim());
-            System.out.println(positionController.delete(id) ? "Xóa thành công." : "Xóa thất bại.");
+            String error = positionController.delete(id);
+            if (error == null) {
+                System.out.println("[OK] Xóa thành công.");
+            } else {
+                System.out.println("[Lỗi] " + error);
+            }
         } catch (NumberFormatException e) {
-            System.out.println("ID không hợp lệ.");
+            System.out.println("[Lỗi] ID phải là số nguyên.");
         }
     }
 }
