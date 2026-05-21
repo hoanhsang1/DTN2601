@@ -1,10 +1,10 @@
 package org.example.backend.controller;
 
-import java.util.List;
-
 import org.example.backend.service.IDepartmentService;
 import org.example.backend.service.impl.DepartmentServiceImpl;
 import org.example.entity.Department;
+
+import java.util.List;
 
 public class DepartmentController {
 
@@ -43,5 +43,9 @@ public class DepartmentController {
     /** Trả về null nếu thành công, thông báo lỗi nếu thất bại. */
     public String delete(int id) {
         return departmentService.delete(id);
+    }
+
+    public String importDepartmentFromCSV(String fileName) {
+        return departmentService.importDepartmentFromCSV(fileName);
     }
 }

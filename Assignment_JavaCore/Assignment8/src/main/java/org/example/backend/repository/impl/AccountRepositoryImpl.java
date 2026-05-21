@@ -231,4 +231,39 @@ public class AccountRepositoryImpl implements IAccountRepository {
         }
         return false;
     }
+
+    @Override
+    public boolean createAccounts(List<Account> accounts) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = JDBCUtils.getConnection();
+            connection.setAutoCommit(false);
+            String sql = "insert into account (username, fullname, email, department_id, position_id, create_date) values (?, ?, ?, ?, ?, now());";
+            preparedStatement = connection.prepareStatement(sql);
+            for (Account account : accounts) {
+                preparedStatement.setString(1, account.getUsername());
+                preparedStatement.setString(2, account.getFullName());
+                preparedStatement.setString(3, account.getEmail());
+                preparedStatement.setInt(4, account.getDepartment().getId());
+                preparedStatement.setInt(5, account.getPosition().getId());
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        } finally {
+            JDBCUtils.close(connection, preparedStatement, null);
+        }
+        return false;
+    }
 }

@@ -13,6 +13,10 @@ public class Department {
         this.name = name;
     }
 
+    public Department(String departmentName) {
+        this.name = departmentName;
+    }
+
     public int getId() {
         return id;
     }

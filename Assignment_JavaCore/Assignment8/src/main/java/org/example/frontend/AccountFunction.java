@@ -34,6 +34,7 @@ public class AccountFunction {
             System.out.println("4. Thêm mới account");
             System.out.println("5. Cập nhật account");
             System.out.println("6. Xóa account");
+            System.out.println("7. Import từ file csv account");
             System.out.println("0. Quay lại");
             System.out.print("Chọn: ");
             String choice = sc.nextLine().trim();
@@ -44,6 +45,7 @@ public class AccountFunction {
                 case "4": insertAccount();                          break;
                 case "5": updateAccount();                          break;
                 case "6": deleteAccount();                          break;
+                case "7": importAccountFromCSV();                  break;
                 case "0": return;
                 default:  System.out.println("Lựa chọn không hợp lệ, thử lại.");
             }
@@ -155,6 +157,14 @@ public class AccountFunction {
         } catch (NumberFormatException e) {
             System.out.println("[Lỗi] ID phải là số nguyên.");
         }
+    }
+
+    private void importAccountFromCSV() {
+        System.out.println("========== IMPORT ACCOUNT ==========");
+        System.out.print("Nhập địa chỉ lưu file Import: ");
+        String fileName = sc.nextLine().trim();
+        String result = accountController.importAccountFromCSV(fileName);
+        System.out.println(result);
     }
 
     private int chooseDepartment() {

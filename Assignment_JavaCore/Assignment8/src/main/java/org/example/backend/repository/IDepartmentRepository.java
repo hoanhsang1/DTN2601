@@ -1,8 +1,9 @@
 package org.example.backend.repository;
 
-import java.util.List;
-
 import org.example.entity.Department;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public interface IDepartmentRepository {
     List<Department> findAll();
@@ -19,4 +20,6 @@ public interface IDepartmentRepository {
     boolean create(String name);
     boolean update(int id, String name);
     boolean delete(int id);
+    boolean createDepartments(List<Department> departments) throws SQLException;
+
 }

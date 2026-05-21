@@ -251,6 +251,36 @@ public class AccountTest {
         System.out.println("  => PASS: xóa id=" + id);
     }
 
+    @Test
+    public void test21_ImportAccountFromCSV() throws Exception {
+        System.out.println("\n[TEST] IMPORT ACCOUNT FROM CSV");
+        java.io.File csvFile = new java.io.File("target/test_import_acc.csv");
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(csvFile)) {
+            pw.println("username,fullname,email,department_id,position_id");
+            pw.println("acc_csv_1,Account CSV 1,acc_csv_1@test.com," + tempDeptId + "," + tempPosId);
+            pw.println("acc_csv_1,Account CSV 1 Dup,acc_csv_1_dup@test.com," + tempDeptId + "," + tempPosId);
+            pw.println("acc_csv_2,Account CSV 2,invalid_email," + tempDeptId + "," + tempPosId);
+            pw.println("acc_csv_3,Account CSV 3,acc_csv_3@test.com,99999," + tempPosId);
+        }
+
+        String result = accountController.importAccountFromCSV(csvFile.getAbsolutePath());
+        System.out.println("Result: " + result);
+        org.junit.Assert.assertTrue(result.contains("Import hoàn tất") || result.contains("Import thành công"));
+
+        java.io.File errFile = new java.io.File("target/test_import_acc_error.csv");
+        org.junit.Assert.assertTrue("Error CSV should be created", errFile.exists());
+
+        List<Account> list = accountController.findByName("Account CSV 1");
+        org.junit.Assert.assertFalse(list.isEmpty());
+
+        for (Account a : list) {
+            accountController.delete(a.getId());
+        }
+        csvFile.delete();
+        errFile.delete();
+        System.out.println("  => PASS: account csv import tested successfully.");
+    }
+
     // ================================================================ helper
     private void printTable(List<Account> list) {
         String border = "+-------+------------------+--------------------+----------------------------+--------------------+----------------+";

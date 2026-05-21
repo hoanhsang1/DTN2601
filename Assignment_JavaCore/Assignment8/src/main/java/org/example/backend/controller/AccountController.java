@@ -38,4 +38,8 @@ public class AccountController {
     public String delete(int id) {
         return accountService.delete(id);
     }
+
+    public String importAccountFromCSV(String fileName) {
+        return accountService.importAccountFromCSV(fileName);
+    }
 }

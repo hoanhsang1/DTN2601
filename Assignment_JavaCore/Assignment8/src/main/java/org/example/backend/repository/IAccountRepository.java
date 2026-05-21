@@ -19,4 +19,5 @@ public interface IAccountRepository {
     boolean create(String username, String fullName, String email, int departmentId, int positionId);
     boolean update(int id, String username, String fullName, String email, int departmentId, int positionId);
     boolean delete(int id);
+    boolean createAccounts(List<Account> accounts) throws java.sql.SQLException;
 }

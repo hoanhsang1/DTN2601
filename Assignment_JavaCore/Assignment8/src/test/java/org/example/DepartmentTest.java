@@ -200,6 +200,36 @@ public class DepartmentTest {
         System.out.println("  => PASS: xóa id=" + id);
     }
 
+    @Test
+    public void test18_ImportDepartmentFromCSV() throws Exception {
+        System.out.println("\n[TEST] IMPORT DEPARTMENT FROM CSV");
+        java.io.File csvFile = new java.io.File("target/test_import_dept.csv");
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(csvFile)) {
+            pw.println("department_name");
+            pw.println("TEST_DEPT_CSV_1");
+            pw.println("Sale");
+            pw.println("TEST_DEPT_CSV_1");
+            pw.println("");
+        }
+
+        String result = controller.importDepartmentFromCSV(csvFile.getAbsolutePath());
+        System.out.println("Result: " + result);
+        assertTrue(result.contains("Import hoàn tất") || result.contains("Import thành công"));
+        
+        java.io.File errFile = new java.io.File("target/test_import_dept_error.csv");
+        assertTrue("Error CSV should be created", errFile.exists());
+
+        List<Department> list = controller.findByName("TEST_DEPT_CSV_1");
+        assertFalse(list.isEmpty());
+
+        for (Department d : list) {
+            controller.delete(d.getId());
+        }
+        csvFile.delete();
+        errFile.delete();
+        System.out.println("  => PASS: department csv import tested successfully.");
+    }
+
     // ================================================================ helper
     private void printTable(List<Department> list) {
         System.out.println("+-------+------------------------+");

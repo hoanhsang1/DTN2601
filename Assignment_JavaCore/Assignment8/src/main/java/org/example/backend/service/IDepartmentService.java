@@ -1,8 +1,8 @@
 package org.example.backend.service;
 
-import java.util.List;
-
 import org.example.entity.Department;
+
+import java.util.List;
 
 public interface IDepartmentService {
     List<Department> findAll();
@@ -17,4 +17,6 @@ public interface IDepartmentService {
     String create(String name);
     String update(int id, String name);
     String delete(int id);
+
+    String importDepartmentFromCSV(String fileName);
 }

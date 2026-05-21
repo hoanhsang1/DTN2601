@@ -15,4 +15,5 @@ public interface IAccountService {
     String create(String username, String fullName, String email, int departmentId, int positionId);
     String update(int id, String username, String fullName, String email, int departmentId, int positionId);
     String delete(int id);
+    String importAccountFromCSV(String fileName);
 }
