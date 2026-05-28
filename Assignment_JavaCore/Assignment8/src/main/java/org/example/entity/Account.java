@@ -10,6 +10,15 @@ public class Account {
     private Department department;
     private Position position;
     private Date createDate;
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public Account() {
 

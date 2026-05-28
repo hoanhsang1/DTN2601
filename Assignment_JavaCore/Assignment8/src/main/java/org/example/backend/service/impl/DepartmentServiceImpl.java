@@ -3,18 +3,26 @@ package org.example.backend.service.impl;
 import org.example.backend.repository.IDepartmentRepository;
 import org.example.backend.repository.impl.DepartmentRepositoryImpl;
 import org.example.backend.service.IDepartmentService;
+import org.example.backend.service.ImportFile;
+import org.example.dto.ImportError;
 import org.example.entity.Department;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
-public class DepartmentServiceImpl implements IDepartmentService {
+public class DepartmentServiceImpl implements IDepartmentService, ImportFile<Department> {
 
     IDepartmentRepository departmentRepository = new DepartmentRepositoryImpl();
 
+    // ============================================================= FIND
     @Override
     public List<Department> findAll() {
         return departmentRepository.findAll();
@@ -40,172 +48,151 @@ public class DepartmentServiceImpl implements IDepartmentService {
         return departmentRepository.findLeastEmployees();
     }
 
-    // ------------------------------------------------------------------ CREATE
+    // ============================================================= VALIDATE (dùng chung create/update)
+    private String validateDepartmentFields(Integer id, String name) {
+        if (id != null) {
+            if (id <= 0)                             return "ID phải lớn hơn 0.";
+            if (!departmentRepository.existsById(id)) return "Phòng ban với ID=" + id + " không tồn tại.";
+        }
+
+        if (name == null || name.trim().isEmpty()) return "Tên phòng ban không được để trống.";
+        String nameTrimmed = name.trim();
+
+        if (id == null) {
+            if (departmentRepository.existsByName(nameTrimmed))
+                return "Tên phòng ban \"" + nameTrimmed + "\" đã tồn tại.";
+        } else {
+            if (departmentRepository.existsByNameExcludeId(nameTrimmed, id))
+                return "Tên phòng ban \"" + nameTrimmed + "\" đã được sử dụng bởi phòng ban khác.";
+        }
+
+        return null;
+    }
+
+    // ============================================================= CREATE
     @Override
     public String create(String name) {
-        // validate: null hoặc rỗng
-        if (name == null || name.trim().isEmpty()) {
-            return "Tên phòng ban không được để trống.";
-        }
-        name = name.trim();
-        // validate: đã tồn tại chưa (unique)
-        if (departmentRepository.existsByName(name)) {
-            return "Tên phòng ban \"" + name + "\" đã tồn tại.";
-        }
-        boolean ok = departmentRepository.create(name);
+        String err = validateDepartmentFields(null, name);
+        if (err != null) return err;
+
+        boolean ok = departmentRepository.create(name.trim());
         return ok ? null : "Thêm mới thất bại, vui lòng thử lại.";
     }
 
-    // ------------------------------------------------------------------ UPDATE
+    // ============================================================= UPDATE
     @Override
     public String update(int id, String name) {
-        // validate id > 0
-        if (id <= 0) {
-            return "ID phải lớn hơn 0.";
-        }
-        // validate id tồn tại
-        if (!departmentRepository.existsById(id)) {
-            return "Phòng ban với ID=" + id + " không tồn tại.";
-        }
-        // validate tên
-        if (name == null || name.trim().isEmpty()) {
-            return "Tên phòng ban không được để trống.";
-        }
-        name = name.trim();
-        // validate unique: tên mới không được trùng với phòng ban khác
-        // (cho phép giữ nguyên tên của chính nó)
-        if (departmentRepository.existsByNameExcludeId(name, id)) {
-            return "Tên phòng ban \"" + name + "\" đã được sử dụng bởi phòng ban khác.";
-        }
-        boolean ok = departmentRepository.update(id, name);
+        String err = validateDepartmentFields(id, name);
+        if (err != null) return err;
+
+        boolean ok = departmentRepository.update(id, name.trim());
         return ok ? null : "Cập nhật thất bại, vui lòng thử lại.";
     }
 
-    // ------------------------------------------------------------------ DELETE
+    // ============================================================= DELETE
     @Override
     public String delete(int id) {
-        // validate id > 0
-        if (id <= 0) {
-            return "ID phải lớn hơn 0.";
-        }
-        // validate id tồn tại
-        if (!departmentRepository.existsById(id)) {
-            return "Phòng ban với ID=" + id + " không tồn tại.";
-        }
+        if (id <= 0)                             return "ID phải lớn hơn 0.";
+        if (!departmentRepository.existsById(id)) return "Phòng ban với ID=" + id + " không tồn tại.";
         boolean ok = departmentRepository.delete(id);
         return ok ? null : "Xóa thất bại, vui lòng thử lại.";
     }
 
+    // ============================================================= IMPORT CSV (via ImportFile<Department>)
     @Override
     public String importDepartmentFromCSV(String pathName) {
-        java.io.File file = new java.io.File(pathName);
-        if (!file.exists() || !file.isFile()) {
-            return "[Lỗi] File không tồn tại: " + pathName;
-        }
+        return importFile(pathName);
+    }
 
+    /**
+     * Đọc file CSV, gọi validateRow() từng dòng, trả về danh sách Department hợp lệ.
+     * Dòng lỗi được thu thập vào importErrors.
+     */
+    @Override
+    public List<Department> readFile(String pathName, List<ImportError> importErrors) {
         List<Department> departments = new ArrayList<>();
-        List<ImportError> importErrors = new ArrayList<>();
-        java.util.Set<String> importedNames = new java.util.HashSet<>();
+        Set<String> seenNames = new HashSet<>();  // theo dõi tên trùng lặp trong file
         boolean firstLine = true;
 
-        try (BufferedReader br = new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "UTF-8"))) {
+        java.io.File file = new java.io.File(pathName);
+        if (!file.exists() || !file.isFile()) {
+            return departments;
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-                if (firstLine) {
-                    firstLine = false;
-                    continue;
-                }
+                if (line.trim().isEmpty()) continue;
+                if (firstLine) { firstLine = false; continue; }  // bỏ header
 
-                List<String> errors = new ArrayList<>();
                 String[] fields = line.split(",");
-                String departmentName = fields.length > 0 ? fields[0] : "";
+                List<String> errors = new ArrayList<>();
 
-                if (Objects.isNull(departmentName) || departmentName.trim().isEmpty()) {
-                    errors.add("Tên phòng ban không được để trống");
-                } else {
-                    String deptNameTrimmed = departmentName.trim();
-                    if (departmentRepository.existsByName(deptNameTrimmed)) {
-                        errors.add("Tên phòng ban đã tồn tại");
-                    }
-                    if (importedNames.contains(deptNameTrimmed.toLowerCase())) {
-                        errors.add("Tên phòng ban bị trùng lặp trong file");
-                    } else {
-                        importedNames.add(deptNameTrimmed.toLowerCase());
-                    }
-                }
-
-                if (errors.isEmpty()) {
-                    Department dep = new Department(departmentName.trim());
-                    departments.add(dep);
+                Department dept = validateRow(fields, errors, seenNames);
+                if (errors.isEmpty() && dept != null) {
+                    departments.add(dept);
                 } else {
                     importErrors.add(new ImportError(line, String.join(" | ", errors)));
                 }
             }
-        } catch (Exception e) {
-            return "[Lỗi] Không thể đọc file: " + e.getMessage();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+        return departments;
+    }
 
-        String pathError;
-        if (pathName.toLowerCase().endsWith(".csv")) {
-            pathError = pathName.substring(0, pathName.length() - 4) + "_error.csv";
+    /**
+     * Implement validate() của ImportFile<T> — phiên bản không có context trùng lặp.
+     * (Dùng khi validate đơn lẻ 1 dòng, không trong vòng lặp đọc file)
+     */
+    @Override
+    public Department validate(String[] fields, List<String> errors) {
+        return validateRow(fields, errors, new HashSet<>());
+    }
+
+    /**
+     * Validate một dòng CSV → trả về Department nếu hợp lệ, null nếu có lỗi.
+     * seenNames theo dõi tên trùng lặp trong phạm vi cùng file import.
+     */
+    private Department validateRow(String[] fields, List<String> errors, Set<String> seenNames) {
+        String name = fields.length > 0 ? fields[0].trim() : "";
+
+        // 1. Tên không được rỗng
+        if (name.isEmpty()) {
+            errors.add("Tên phòng ban không được để trống");
         } else {
-            pathError = pathName + "_error.csv";
+            // 2. Trùng trong DB
+            if (departmentRepository.existsByName(name))
+                errors.add("Tên phòng ban \"" + name + "\" đã tồn tại");
+
+            // 3. Trùng trong file
+            if (seenNames.contains(name.toLowerCase()))
+                errors.add("Tên phòng ban bị trùng lặp trong file");
+            else
+                seenNames.add(name.toLowerCase());
         }
 
-        if (!importErrors.isEmpty()) {
-            try (BufferedWriter bw = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(pathError), "UTF-8"))) {
-                bw.write("department_name,message_error");
+        if (!errors.isEmpty()) return null;
+
+        return new Department(name);
+    }
+
+    @Override
+    public boolean insertEntitiesToDB(List<Department> departments) throws Exception {
+        return departmentRepository.createDepartments(departments);
+    }
+
+    @Override
+    public void exportFileError(String pathError, List<ImportError> importErrors) throws Exception {
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(pathError), "UTF-8"))) {
+            bw.write("department_name,message_error");
+            bw.newLine();
+            for (ImportError err : importErrors) {
+                bw.write(err.getLine() + "," + err.getMessage());
                 bw.newLine();
-                for (ImportError error : importErrors) {
-                    bw.write(error.getLine() + "," + error.getMessage());
-                    bw.newLine();
-                }
-            } catch (Exception e) {
-                return "[Lỗi] Không thể ghi file lỗi: " + e.getMessage();
             }
         }
-
-        boolean checkImport = false;
-        if (!departments.isEmpty()) {
-            try {
-                checkImport = departmentRepository.createDepartments(departments);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            checkImport = true;
-        }
-
-        if (importErrors.isEmpty()) {
-            return "Import thành công. Đã nhập " + departments.size() + " phòng ban.";
-        } else {
-            if (departments.isEmpty()) {
-                return "Import thất bại, toàn bộ " + importErrors.size() + " dòng đều bị lỗi. Chi tiết lỗi đã được xuất ra: " + pathError;
-            }
-            return checkImport
-                ? "Import hoàn tất (có lỗi). Đã nhập " + departments.size() + " phòng ban. " + importErrors.size() + " dòng bị lỗi (đã xuất file lỗi tại " + pathError + ")."
-                : "Lỗi kết nối cơ sở dữ liệu khi import. Chi tiết lỗi đã được xuất ra: " + pathError;
-        }
-    }
-}
-
-class ImportError {
-    private final String line;
-    private final String message;
-
-    public ImportError(String line, String message) {
-        this.line = line;
-        this.message = message;
-    }
-
-    public String getLine() {
-        return line;
-    }
-
-    public String getMessage() {
-        return message;
     }
 }

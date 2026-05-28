@@ -1,14 +1,5 @@
 package org.example.backend.service.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.example.backend.repository.IAccountRepository;
 import org.example.backend.repository.IDepartmentRepository;
 import org.example.backend.repository.IPositionRepository;
@@ -16,14 +7,30 @@ import org.example.backend.repository.impl.AccountRepositoryImpl;
 import org.example.backend.repository.impl.DepartmentRepositoryImpl;
 import org.example.backend.repository.impl.PositionRepositoryImpl;
 import org.example.backend.service.IAccountService;
+import org.example.backend.service.ImportFile;
+import org.example.dto.ImportError;
 import org.example.entity.Account;
+import org.example.entity.Department;
+import org.example.entity.Position;
 
-public class AccountServiceImpl implements IAccountService {
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    IAccountRepository  accountRepository    = new AccountRepositoryImpl();
+public class AccountServiceImpl implements IAccountService, ImportFile<Account> {
+
+    IAccountRepository    accountRepository    = new AccountRepositoryImpl();
     IDepartmentRepository departmentRepository = new DepartmentRepositoryImpl();
-    IPositionRepository positionRepository   = new PositionRepositoryImpl();
+    IPositionRepository   positionRepository   = new PositionRepositoryImpl();
 
+    // ============================================================= FIND
     @Override
     public List<Account> findAll() {
         return accountRepository.findAll();
@@ -39,285 +46,235 @@ public class AccountServiceImpl implements IAccountService {
         return accountRepository.findByName(name);
     }
 
-    // ------------------------------------------------------------------ CREATE
+    // ============================================================= VALIDATE (dùng chung create/update)
+    private String validateAccountFields(Integer id, String username, String fullName, String email,
+                                         int departmentId, int positionId) {
+        if (id != null) {
+            if (id <= 0)                        return "ID phải lớn hơn 0.";
+            if (!accountRepository.existsById(id)) return "Account với ID=" + id + " không tồn tại.";
+        }
+
+        if (username == null || username.trim().isEmpty()) return "Username không được để trống.";
+        String u = username.trim();
+        if (id == null) {
+            if (accountRepository.existsByUsername(u))
+                return "Username \"" + u + "\" đã tồn tại.";
+        } else {
+            if (accountRepository.existsByUsernameExcludeId(u, id))
+                return "Username \"" + u + "\" đã được sử dụng bởi account khác.";
+        }
+
+        if (fullName == null || fullName.trim().isEmpty()) return "Họ tên không được để trống.";
+
+        if (email == null || email.trim().isEmpty()) return "Email không được để trống.";
+        String e = email.trim();
+        if (!e.contains("@") || e.indexOf("@") == 0 || e.indexOf("@") == e.length() - 1)
+            return "Email không hợp lệ (phải có ký tự '@' ở giữa).";
+        if (id == null) {
+            if (accountRepository.existsByEmail(e))
+                return "Email \"" + e + "\" đã được sử dụng.";
+        } else {
+            if (accountRepository.existsByEmailExcludeId(e, id))
+                return "Email \"" + e + "\" đã được sử dụng bởi account khác.";
+        }
+
+        if (!departmentRepository.existsById(departmentId))
+            return "Phòng ban với ID=" + departmentId + " không tồn tại.";
+        if (!positionRepository.existsById(positionId))
+            return "Chức vụ với ID=" + positionId + " không tồn tại.";
+
+        return null;
+    }
+
+    // ============================================================= CREATE
     @Override
     public String create(String username, String fullName, String email,
                          int departmentId, int positionId) {
-        // username: không null, không rỗng, unique
-        if (username == null || username.trim().isEmpty()) {
-            return "Username không được để trống.";
-        }
-        username = username.trim();
-        if (accountRepository.existsByUsername(username)) {
-            return "Username \"" + username + "\" đã tồn tại.";
-        }
+        String err = validateAccountFields(null, username, fullName, email, departmentId, positionId);
+        if (err != null) return err;
 
-        // fullName: không null, không rỗng
-        if (fullName == null || fullName.trim().isEmpty()) {
-            return "Họ tên không được để trống.";
-        }
-        fullName = fullName.trim();
-
-        // email: không null, không rỗng, có @, unique
-        if (email == null || email.trim().isEmpty()) {
-            return "Email không được để trống.";
-        }
-        email = email.trim();
-        if (!email.contains("@") || email.indexOf("@") == 0 || email.indexOf("@") == email.length() - 1) {
-            return "Email không hợp lệ (phải có ký tự '@' ở giữa).";
-        }
-        if (accountRepository.existsByEmail(email)) {
-            return "Email \"" + email + "\" đã được sử dụng.";
-        }
-
-        // departmentId: phải tồn tại
-        if (!departmentRepository.existsById(departmentId)) {
-            return "Phòng ban với ID=" + departmentId + " không tồn tại.";
-        }
-
-        // positionId: phải tồn tại
-        if (!positionRepository.existsById(positionId)) {
-            return "Chức vụ với ID=" + positionId + " không tồn tại.";
-        }
-
-        boolean ok = accountRepository.create(username, fullName, email, departmentId, positionId);
+        boolean ok = accountRepository.create(username.trim(), fullName.trim(), email.trim(), departmentId, positionId);
         return ok ? null : "Thêm mới thất bại, vui lòng thử lại.";
     }
 
-    // ------------------------------------------------------------------ UPDATE
+    // ============================================================= UPDATE
     @Override
     public String update(int id, String username, String fullName, String email,
                          int departmentId, int positionId) {
-        // id > 0 và tồn tại
-        if (id <= 0) {
-            return "ID phải lớn hơn 0.";
-        }
-        if (!accountRepository.existsById(id)) {
-            return "Account với ID=" + id + " không tồn tại.";
-        }
+        String err = validateAccountFields(id, username, fullName, email, departmentId, positionId);
+        if (err != null) return err;
 
-        // username: không null, không rỗng, unique (trừ chính nó)
-        if (username == null || username.trim().isEmpty()) {
-            return "Username không được để trống.";
-        }
-        username = username.trim();
-        if (accountRepository.existsByUsernameExcludeId(username, id)) {
-            return "Username \"" + username + "\" đã được sử dụng bởi account khác.";
-        }
-
-        // fullName: không null, không rỗng
-        if (fullName == null || fullName.trim().isEmpty()) {
-            return "Họ tên không được để trống.";
-        }
-        fullName = fullName.trim();
-
-        // email: không null, không rỗng, có @, unique (trừ chính nó)
-        if (email == null || email.trim().isEmpty()) {
-            return "Email không được để trống.";
-        }
-        email = email.trim();
-        if (!email.contains("@") || email.indexOf("@") == 0 || email.indexOf("@") == email.length() - 1) {
-            return "Email không hợp lệ (phải có ký tự '@' ở giữa).";
-        }
-        if (accountRepository.existsByEmailExcludeId(email, id)) {
-            return "Email \"" + email + "\" đã được sử dụng bởi account khác.";
-        }
-
-        // departmentId: phải tồn tại
-        if (!departmentRepository.existsById(departmentId)) {
-            return "Phòng ban với ID=" + departmentId + " không tồn tại.";
-        }
-
-        // positionId: phải tồn tại
-        if (!positionRepository.existsById(positionId)) {
-            return "Chức vụ với ID=" + positionId + " không tồn tại.";
-        }
-
-        boolean ok = accountRepository.update(id, username, fullName, email, departmentId, positionId);
+        boolean ok = accountRepository.update(id, username.trim(), fullName.trim(), email.trim(), departmentId, positionId);
         return ok ? null : "Cập nhật thất bại, vui lòng thử lại.";
     }
 
-    // ------------------------------------------------------------------ DELETE
+    // ============================================================= DELETE
     @Override
     public String delete(int id) {
-        if (id <= 0) {
-            return "ID phải lớn hơn 0.";
-        }
-        if (!accountRepository.existsById(id)) {
-            return "Account với ID=" + id + " không tồn tại.";
-        }
+        if (id <= 0)                        return "ID phải lớn hơn 0.";
+        if (!accountRepository.existsById(id)) return "Account với ID=" + id + " không tồn tại.";
         boolean ok = accountRepository.delete(id);
         return ok ? null : "Xóa thất bại, vui lòng thử lại.";
     }
 
+    // ============================================================= IMPORT CSV (via ImportFile<Account>)
     @Override
     public String importAccountFromCSV(String pathName) {
-        java.io.File file = new java.io.File(pathName);
-        if (!file.exists() || !file.isFile()) {
-            return "[Lỗi] File không tồn tại: " + pathName;
-        }
+        return importFile(pathName);
+    }
 
+    /**
+     * Đọc file CSV, gọi validate() từng dòng, trả về danh sách Account hợp lệ.
+     * Dòng lỗi được thu thập vào importErrors.
+     */
+    @Override
+    public List<Account> readFile(String pathName, List<ImportError> importErrors) {
         List<Account> accounts = new ArrayList<>();
-        List<ImportError> importErrors = new ArrayList<>();
-        Set<String> importedUsernames = new HashSet<>();
-        Set<String> importedEmails = new HashSet<>();
+        Set<String> seenUsernames = new HashSet<>();
+        Set<String> seenEmails    = new HashSet<>();
         boolean firstLine = true;
 
-        try (BufferedReader br = new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "UTF-8"))) {
+        java.io.File file = new java.io.File(pathName);
+        if (!file.exists() || !file.isFile()) {
+            return accounts;   // importFile() sẽ trả lỗi file không tồn tại
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-                if (firstLine) {
-                    firstLine = false;
-                    continue;
-                }
+                if (line.trim().isEmpty()) continue;
+                if (firstLine) { firstLine = false; continue; }   // bỏ header
 
-                List<String> errors = new ArrayList<>();
-                // CSV format: username, fullname, email, department_id, position_id
                 String[] fields = line.split(",");
-                if (fields.length < 5) {
-                    errors.add("Dòng không đủ số cột (yêu cầu 5 cột: username,fullname,email,department_id,position_id)");
-                    importErrors.add(new ImportError(line, String.join(" | ", errors)));
-                    continue;
-                }
+                List<String> errors = new ArrayList<>();
 
-                String username = fields[0] != null ? fields[0].trim() : "";
-                String fullName = fields[1] != null ? fields[1].trim() : "";
-                String email = fields[2] != null ? fields[2].trim() : "";
-                String deptIdStr = fields[3] != null ? fields[3].trim() : "";
-                String posIdStr = fields[4] != null ? fields[4].trim() : "";
-
-                // 1. Validate username
-                if (username.isEmpty()) {
-                    errors.add("Username không được để trống");
-                } else {
-                    if (accountRepository.existsByUsername(username)) {
-                        errors.add("Username \"" + username + "\" đã tồn tại");
-                    }
-                    if (importedUsernames.contains(username.toLowerCase())) {
-                        errors.add("Username bị trùng lặp trong file");
-                    } else {
-                        importedUsernames.add(username.toLowerCase());
-                    }
-                }
-
-                // 2. Validate fullName
-                if (fullName.isEmpty()) {
-                    errors.add("Họ tên không được để trống");
-                }
-
-                // 3. Validate email
-                if (email.isEmpty()) {
-                    errors.add("Email không được để trống");
-                } else {
-                    if (!email.contains("@") || email.indexOf("@") == 0 || email.indexOf("@") == email.length() - 1) {
-                        errors.add("Email không hợp lệ (phải có '@' ở giữa)");
-                    } else {
-                        if (accountRepository.existsByEmail(email)) {
-                            errors.add("Email \"" + email + "\" đã được sử dụng");
-                        }
-                        if (importedEmails.contains(email.toLowerCase())) {
-                            errors.add("Email bị trùng lặp trong file");
-                        } else {
-                            importedEmails.add(email.toLowerCase());
-                        }
-                    }
-                }
-
-                // 4. Validate departmentId
-                int departmentId = -1;
-                if (deptIdStr.isEmpty()) {
-                    errors.add("ID phòng ban không được để trống");
-                } else {
-                    try {
-                        departmentId = Integer.parseInt(deptIdStr);
-                        if (!departmentRepository.existsById(departmentId)) {
-                            errors.add("ID phòng ban " + departmentId + " không tồn tại");
-                        }
-                    } catch (NumberFormatException e) {
-                        errors.add("ID phòng ban phải là số nguyên");
-                    }
-                }
-
-                // 5. Validate positionId
-                int positionId = -1;
-                if (posIdStr.isEmpty()) {
-                    errors.add("ID chức vụ không được để trống");
-                } else {
-                    try {
-                        positionId = Integer.parseInt(posIdStr);
-                        if (!positionRepository.existsById(positionId)) {
-                            errors.add("ID chức vụ " + positionId + " không tồn tại");
-                        }
-                    } catch (NumberFormatException e) {
-                        errors.add("ID chức vụ phải là số nguyên");
-                    }
-                }
-
-                if (errors.isEmpty()) {
-                    org.example.entity.Department dep = new org.example.entity.Department();
-                    dep.setId(departmentId);
-                    org.example.entity.Position pos = new org.example.entity.Position();
-                    pos.setId(positionId);
-
-                    Account acc = new Account();
-                    acc.setUsername(username);
-                    acc.setFullName(fullName);
-                    acc.setEmail(email);
-                    acc.setDepartment(dep);
-                    acc.setPosition(pos);
-
+                // truyền thêm seenUsernames/Emails để kiểm tra trùng lặp trong file
+                Account acc = validateRow(fields, errors, seenUsernames, seenEmails);
+                if (errors.isEmpty() && acc != null) {
                     accounts.add(acc);
                 } else {
                     importErrors.add(new ImportError(line, String.join(" | ", errors)));
                 }
             }
-        } catch (Exception e) {
-            return "[Lỗi] Không thể đọc file: " + e.getMessage();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return accounts;
+    }
+
+    /**
+     * Implement validate() của ImportFile<T> — phiên bản không có context trùng lặp.
+     * (Dùng khi gọi validate đơn lẻ, không cần Set theo dõi trùng)
+     */
+    @Override
+    public Account validate(String[] fields, List<String> errors) {
+        return validateRow(fields, errors, new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * Validate một dòng CSV -> trả về Account nếu hợp lệ, null nếu có lỗi.
+     * seenUsernames / seenEmails theo dõi trùng lặp trong phạm vi cùng file import.
+     */
+    private Account validateRow(String[] fields, List<String> errors,
+                                Set<String> seenUsernames, Set<String> seenEmails) {
+        if (fields.length < 5) {
+            errors.add("Dòng không đủ số cột (yêu cầu 5 cột: username,fullname,email,department_id,position_id)");
+            return null;
         }
 
-        String pathError;
-        if (pathName.toLowerCase().endsWith(".csv")) {
-            pathError = pathName.substring(0, pathName.length() - 4) + "_error.csv";
+        String username  = fields[0].trim();
+        String fullName  = fields[1].trim();
+        String email     = fields[2].trim();
+        String deptIdStr = fields[3].trim();
+        String posIdStr  = fields[4].trim();
+
+        // 1. Username
+        if (username.isEmpty()) {
+            errors.add("Username không được để trống");
         } else {
-            pathError = pathName + "_error.csv";
+            if (accountRepository.existsByUsername(username))
+                errors.add("Username \"" + username + "\" đã tồn tại");
+            if (seenUsernames.contains(username.toLowerCase()))
+                errors.add("Username bị trùng lặp trong file");
+            else
+                seenUsernames.add(username.toLowerCase());
         }
 
-        if (!importErrors.isEmpty()) {
-            try (BufferedWriter bw = new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(pathError), "UTF-8"))) {
-                bw.write("raw_line,message_error");
-                bw.newLine();
-                for (ImportError error : importErrors) {
-                    bw.write(error.getLine() + "," + error.getMessage());
-                    bw.newLine();
-                }
-            } catch (Exception e) {
-                return "[Lỗi] Không thể ghi file lỗi: " + e.getMessage();
-            }
+        // 2. Họ tên
+        if (fullName.isEmpty()) errors.add("Họ tên không được để trống");
+
+        // 3. Email
+        if (email.isEmpty()) {
+            errors.add("Email không được để trống");
+        } else if (!email.contains("@") || email.indexOf("@") == 0 || email.indexOf("@") == email.length() - 1) {
+            errors.add("Email không hợp lệ (phải có '@' ở giữa)");
+        } else {
+            if (accountRepository.existsByEmail(email))
+                errors.add("Email \"" + email + "\" đã được sử dụng");
+            if (seenEmails.contains(email.toLowerCase()))
+                errors.add("Email bị trùng lặp trong file");
+            else
+                seenEmails.add(email.toLowerCase());
         }
 
-        boolean checkImport = false;
-        if (!accounts.isEmpty()) {
+        // 4. Department ID
+        int departmentId = -1;
+        if (deptIdStr.isEmpty()) {
+            errors.add("ID phòng ban không được để trống");
+        } else {
             try {
-                checkImport = accountRepository.createAccounts(accounts);
-            } catch (Exception e) {
-                e.printStackTrace();
+                departmentId = Integer.parseInt(deptIdStr);
+                if (!departmentRepository.existsById(departmentId))
+                    errors.add("ID phòng ban " + departmentId + " không tồn tại");
+            } catch (NumberFormatException ex) {
+                errors.add("ID phòng ban phải là số nguyên");
             }
-        } else {
-            checkImport = true;
         }
 
-        if (importErrors.isEmpty()) {
-            return "Import thành công. Đã nhập " + accounts.size() + " tài khoản.";
+        // 5. Position ID
+        int positionId = -1;
+        if (posIdStr.isEmpty()) {
+            errors.add("ID chức vụ không được để trống");
         } else {
-            if (accounts.isEmpty()) {
-                return "Import thất bại, toàn bộ " + importErrors.size() + " dòng đều bị lỗi. Chi tiết lỗi đã được xuất ra: " + pathError;
+            try {
+                positionId = Integer.parseInt(posIdStr);
+                if (!positionRepository.existsById(positionId))
+                    errors.add("ID chức vụ " + positionId + " không tồn tại");
+            } catch (NumberFormatException ex) {
+                errors.add("ID chức vụ phải là số nguyên");
             }
-            return checkImport
-                ? "Import hoàn tất (có lỗi). Đã nhập " + accounts.size() + " tài khoản. " + importErrors.size() + " dòng bị lỗi (đã xuất file lỗi tại " + pathError + ")."
-                : "Lỗi kết nối cơ sở dữ liệu khi import. Chi tiết lỗi đã được xuất ra: " + pathError;
+        }
+
+        if (!errors.isEmpty()) return null;
+
+        Department dep = new Department(); dep.setId(departmentId);
+        Position   pos = new Position();   pos.setId(positionId);
+
+        Account acc = new Account();
+        acc.setUsername(username);
+        acc.setFullName(fullName);
+        acc.setEmail(email);
+        acc.setDepartment(dep);
+        acc.setPosition(pos);
+        return acc;
+    }
+
+    @Override
+    public boolean insertEntitiesToDB(List<Account> accounts) throws Exception {
+        return accountRepository.createAccounts(accounts);
+    }
+
+    @Override
+    public void exportFileError(String pathError, List<ImportError> importErrors) throws Exception {
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(pathError), "UTF-8"))) {
+            bw.write("raw_line,message_error");
+            bw.newLine();
+            for (ImportError err : importErrors) {
+                bw.write(err.getLine() + "," + err.getMessage());
+                bw.newLine();
+            }
         }
     }
 }
